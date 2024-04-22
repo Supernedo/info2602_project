@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ current_movie.title }} Review</title>
+        <title>{{ movie.title }}'s Reviews</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/752212043125227571/1227669996369612830/oie_gsII4R2sd8Ea.png?ex=66293fc8&is=6616cac8&hm=9e9ff980dd2ad487353b1054d4d1295c9981be4941cb9b815241c76b05f381ac&">
         
@@ -120,7 +120,6 @@
             </div>
         </div>
     
-
         <div class="content">
             <div class="blur-containter">
                 <div class="blur-overlay"></div>
@@ -140,126 +139,63 @@
                     </button>
                 </form>
             </div>
-    
-           
-                <div id="movie-header">
-                {% if is_authenticated %}
-                    <form id="movie-form-watchlist" action="/watchlist" method="POST">
-                        <div id="add-watchlist-submit">
-                            <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                            <button class="add-watchlist" type="submit" value="Submit">
-                                <span class="add-watchlist-text">Add To Watchlist</span>
-                            </button>
-                        </div>
-                    </form>
-                {% endif %}
-
-                    <form id="movie-form-reviews" action="/{{ current_movie.href }}/reviews/all" method="GET">
-                        <div id="add-watchlist-submit">
-                            <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                            <button class="add-watchlist" type="submit" value="Submit">
-                                <span class="add-watchlist-text">View All Reviews</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-    
-            <!-- Add sorting option -->
-            <div id="firstRow">
-                <div id="review-banner">
-                    <h2 id="subTitle">{{ current_movie.title }}</h2>
-    
-                    <div id="review-movie-content">
-                        <img id="review-movie-backdrop" src="{{ current_movie.backdrop }}" alt="{{ current_movie.title }}">
-                        <div class="review-movie-overlay">
-                            <p id="review-movie-details">{{ current_movie.description }}</p>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="movies_reviews">
-                    <!-- List of movies -->
-                    <div id="moviesList_reviews">
-                        {% for movie in movies %}
-                            <div class="movieCard_reviews">
-                                <a id="movieLink" href="/{{ movie.href }}/review">
-                                    <img id="movieCardImg" src ="{{ movie.thumbnail }}">
-                                    <p id="movieDetails">{{ movie.title }}</p>
-                                    <p id="movieDetails">{{ movie.release_date }}</p>
-                                </a>
-                            </div>
-                        {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div id="reviewBox" class="box">
-                        <h2 id="subTitle">Create Review</h2>
-                        
-                            <div class="filterList">
-                                <form action="/review" method="post">
-                                    <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                                    <div id="reviewItem">
-                                        <h3>{{ current_movie.title }}</h3>
-                                    </div>
-                                    <div id="reviewItem">
-                                        <h3>Genres: {{ current_movie.genres }}</h3>
-                                    </div>
-                                    <div id="reviewItem">
-                                        <h3>Release Date: {{ current_movie.release_date }}</h3>
-                                    </div>
-
-                                    {% if is_authenticated %}
-                                        {% if has_reviewed %}
-                                            <div id="review-rating">
-                                                <h3>Your rating: </h3>
-                                                <span>{{ review.rating }}</span>
-                                            </div>
-                                            <div id="review-rating-text">
-                                                <h3>Your Review:</h3>
-                                                <span>{{ review.text }}</span>
-                                            </div>
-                                            <div id="review-submit">
-                                                <a id="delete-submit" data-value="{{ review.id }}" value="Delete">
-                                                    <span class="login-button-text">Delete</span>
-                                                </a>
-                                            </div>
-                                        {% else %}
-                                            <div id="reviewItem-rating">
-                                                <h3>Add your rating: </h3>
-                                                <input class="login-input" type="number" name="rating" min="1" max="5" step="1" placeholder="Number between 1 and 5...">
-                                            </div>
-                                            <div id="reviewItem-text">
-                                                <h3>Write Your Review:</h3>
-                                                <textarea id="review-textarea" name="text" placeholder="Enter your review here..."></textarea>
-                                            </div>
-                                            <div id="reviewItem-submit">
-                                                <button class="login-submit" type="submit" value="Submit">
-                                                    <span class="login-button-text">Create</span>
-                                                </button>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div id="review-item-login">
-                                            <h2 id="subTitle">Login or Signup to create a review!</h2>
-                                        </div>
-                                    {% endif %}
-                                </form>
-                            </div>
-                    </div>
-                </div>
-                
-            </div>
 
             <!-- Second Row -->
             <video id="videoBG" autoplay loop muted>
                 <source src="https://cdn.discordapp.com/attachments/752212043125227571/1228163328782635059/Moonshower_2.mp4?ex=662b0b3b&is=6618963b&hm=4f82b9b015b4bcd9444eabef9d4db39e2fcaf7032e3306d688d883b5bd783694&"
                     type="video/mp4">
             </video>
+
+            <!--Movie stuff -->
+            <div class = "movie-div"> 
+            
+            <article class="card">
+                <img
+                    class="card__background"
+                    src="{{ movie.thumbnail }}"
+                    alt="Movie_Thumbnail"
+                    width="1920"
+                    height="2193"
+                />
+                <div class="card__content | flow">
+                    <div class="card__content--container | flow">
+                        <h2 class="card__title">{{ movie.title }}</h2>
+                        <p class="card__description">{{ movie.description }}</p>
+                    </div>
+                </div>
+            </article>
+            
+            <div class ="movie-details-div"> 
+                <h3 class="movie-heading-details"> {{ movie.title }}</h3>
+                
+                <section class="details-text">Genre: {{ movie.genres }}</section>
+                <section class="details-text"> Rating: 0 </section>
+                <section class="details-text">{{ movie.description }} </section>
+            </div> 
         </div>
-    </body>
+
+        <div id="review-list-all">
+            {% for review in reviews %}
+                <div class="review-item">
+                    <div class="review-card">
+                        <div id="review-card-details">
+                            <div id="review-score">
+                                <h1 id="review-details-user">{{ users[loop.index0].display_name }}</h1>
+                                <p id="review-details-rating">Rating: {{ review.rating }}</p>
+                                <p id="review-details">{{ review.text }}</p>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- this is the movie review details with the Image as well as the descriptions --> 
+
+    </div>
+</body>
 
     <script>
         //To check if the page is still loading
@@ -344,30 +280,5 @@
                 signupForm.style.display = "block";
             }
         }
-
-        document.getElementById('delete-submit').addEventListener('click', function(event) {
-        event.preventDefault();
-
-        const review = document.getElementById('delete-submit');
-
-        if (review) {
-            var reviewId = review.getAttribute('data-value');
-
-            fetch('/reviews/' + reviewId, {
-                method: 'DELETE',
-                body: JSON.stringify({ /* Request body */ }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    });
     </script>
 </html>

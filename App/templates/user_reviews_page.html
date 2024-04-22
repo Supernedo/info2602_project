@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ current_user.username }}'s Reviews</title>
-    <link rel="stylesheet" href="static/style.css">
-    <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/752212043125227571/1227669996369612830/oie_gsII4R2sd8Ea.png?ex=66293fc8&is=6616cac8&hm=9e9ff980dd2ad487353b1054d4d1295c9981be4941cb9b815241c76b05f381ac&">
-  </head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ current_user.display_name }}'s Reviews</title>
+        <link rel="stylesheet" href="static/style.css">
+        <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/752212043125227571/1227669996369612830/oie_gsII4R2sd8Ea.png?ex=66293fc8&is=6616cac8&hm=9e9ff980dd2ad487353b1054d4d1295c9981be4941cb9b815241c76b05f381ac&">
+        
+        <!-- To show black hole when loading -->
+        <video id="videoFG" autoplay loop muted>
+            <source src="https://cdn.discordapp.com/attachments/752212043125227571/1228438907893452900/Blackhole.mp4?ex=662c0be2&is=661996e2&hm=917ee26f17eae9a01c4561216167137832fb20d3478c35f61065c9f0b3836277&"
+                type="video/mp4">
+        </video>
+    </head>
 <body>
     <div class="sidebar" id="sidebar">
         <!-- Login/Show Account -->
@@ -29,7 +35,7 @@
         </div>
         <!-- Redirect to Wishlist Page -->
         <div class="sidebar-item">
-            <a id="sidebar-anchor" href="/wishlist">
+            <a id="sidebar-anchor" href="/watchlist">
                 <img id="sidebar-img" src="https://cdn.discordapp.com/attachments/752212043125227571/1227674087158190180/3515492.png?ex=66294397&is=6616ce97&hm=1760b25f14a67943d2aeef5da295e675e7c0d5205d9b0ed2adf98dbb1b98f20d&"> 
             </a>
         </div>
@@ -43,7 +49,7 @@
     <div class="sidebar-panel" id="sidebar-panel">
         <div id="login">
             {% if is_authenticated %}
-                <h1>Welcome, {{ current_user.username }} </h1>
+                <h1 class="panel-text" style="font-size: 6vh;">Welcome, {{ current_user.username }} </h1>
                 
                 <form id="logout-form" action="/logout">
                     <button class="login-submit" type="submit">
@@ -63,10 +69,54 @@
 
                     <div class="login-signup-action">
                         <p class="login-input">Aren't registered with us?</p>
-                        <a class="login-input-anchor" href="/signup">Signup</a>
+                        <a class="login-input-anchor" onclick="showSignupPage()">Signup</a>
+                    </div>
+                </form>
+
+                <form id="signup-form" action="/signup" method="POST">
+                    <h1 id="login-header">Signup</h1>
+
+                    <input class="login-input" placeholder="Display Name" name="display_name" type="text" class="validate" required>
+                    <input class="login-input" placeholder="Username" name="username" type="text" class="validate" required>
+                    <input class="login-input" placeholder="Password" name="password" type="password" class="validate" required>
+
+                    <button class="login-submit" type="submit">
+                        <span class="login-button-text">Signup</span>
+                    </button>
+
+                    <div class="login-signup-action">
+                        <p class="login-input">Already registered with us?</p>
+                        <a class="login-input-anchor" onclick="showLoginForm()">Login</a>
                     </div>
                 </form>
             {% endif %}
+        </div>
+
+        <div id="panel-items">
+            <!-- Login/Show Account -->
+            <div class="panel-item" onclick="showLoginPage()">
+                {% if is_authenticated %}
+                    <h1 class="panel-text">Welcome back, {{ current_user.username }}</h1>
+                {% else %}
+                    <h1 class="panel-text">Login /Signup</h1>
+                {% endif %}
+            </div>
+            <!-- Redirect to Home Page -->
+            <div class="panel-item" onclick="window.location.href = '/home'">
+                <h1 class="panel-text">Home Page</h1>
+            </div>
+            <!-- Redirect to Movies Page -->
+            <div class="panel-item" onclick="window.location.href = '/movies'">
+                <h1 class="panel-text">View Movies</h1>
+            </div>
+            <!-- Redirect to Wishlist Page -->
+            <div class="panel-item" onclick="window.location.href = '/watchlist'">
+                <h1 class="panel-text">View Your Watchlist</h1>
+            </div>
+            <!-- Redirect to User Reviews Page -->
+            <div class="panel-item" onclick="window.location.href = '/reviews'">
+                <h1 class="panel-text">View Your Reviews</h1>
+            </div>
         </div>
     </div>
 
@@ -90,17 +140,6 @@
             </form>
         </div>
 
-        <div class="background-container"></div>
-
-        <!-- Add sorting option -->
-        <div id="firstRow">
-            <!-- To show black hole when loading -->
-            <video id="videoFG" autoplay loop muted>
-                <source src="https://cdn.discordapp.com/attachments/752212043125227571/1228438907893452900/Blackhole.mp4?ex=662c0be2&is=661996e2&hm=917ee26f17eae9a01c4561216167137832fb20d3478c35f61065c9f0b3836277&"
-                    type="video/mp4">
-            </video>
-        </div>
-
         <!-- Second Row -->
         <video id="videoBG" autoplay loop muted>
             <source src="https://cdn.discordapp.com/attachments/752212043125227571/1228163328782635059/Moonshower_2.mp4?ex=662b0b3b&is=6618963b&hm=4f82b9b015b4bcd9444eabef9d4db39e2fcaf7032e3306d688d883b5bd783694&"
@@ -110,7 +149,6 @@
         <!-- Show page numbers at top -->
         <div class="pageList">
             {% set maxPage = total // page_count %}
-
             {% if maxPage > 4 %}
                 <!-- To iterate to the previous page -->
                 {% if current_page > 1 %}
@@ -154,14 +192,36 @@
             {% endif %}
         </div>
 
-        <!-- List of movies -->
-        <div id="moviesList">
+        <!-- List of reviews -->
+        <div>
+            <h1 id="user-title">{{ current_user.username }}'s Reviews</h1>
+        </div>
+
+        <div id="review-list">
             {% for review in reviews %}
-                <div class="movieCard">
-                    <a id="movieLink" href="/#/review">
-                        <p id="movieDetails">{{ review.rating }}</p>
-                        <p id="movieDetails">{{ review.text }}</p>
-                    </a>
+                <div class="review-item">
+                    <div class="review-movie">
+                        <img class="review-movie-image" src="{{ movies[loop.index0].thumbnail }}" alt="review_movie_image">
+                    </div>
+
+                    <div class="review-card">
+                        <div id="review-movie">
+                            <span id="review-movie-text">{{ movies[loop.index0].title }}</span>
+                        </div>
+
+                        <div id="review-card-details">
+                            <div id="review-score">
+                                <p id="review-details-rating">Rating: {{ review.rating }}</p>
+                                <p id="review-details">{{ review.text }}</p>
+                            </div>
+        
+                            <form class="review-edit-form" action="/{{ movies[loop.index0].href }}/review">
+                                <button class="review-edit" type="submit">
+                                    <span class="review-edit-text">Edit Review</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>  
                 </div>
             {% endfor %}
             </ul>
@@ -230,7 +290,10 @@
 
             sidebar.addEventListener("mouseleave", function() {
                 sidebarPanel.addEventListener("mouseleave", function() {
-                    sidebarPanel.style.display = "none";
+                    var selectedInput = document.activeElement.classList.contains('login-input');
+
+                    if (!selectedInput)
+                        sidebarPanel.style.display = "none";
                 });
             });
         });
@@ -275,10 +338,57 @@
 
         function showLoginPage() {
             var loginPage = document.getElementById('login');
+            var signupForm = document.getElementById('signup-form');
+            var loginForm = document.getElementById('login-form');
+            var panelItems = document.getElementById('panel-items');
 
             if (loginPage)
             {
+                if (loginPage.style.display == "block")
+                {
+                    loginPage.style.display = "none";
+                    panelItems.style.display = "block";
+                }
+                else
+                {
+                    panelItems.style.display = "none";
+                    loginPage.style.display = "block";
+                    
+                    loginForm.style.display = "block";
+                    signupForm.style.display = "none";
+                }
+            }
+        }
+
+        function showLoginForm() {
+            var loginPage = document.getElementById('login');
+            var signupForm = document.getElementById('signup-form');
+            var loginForm = document.getElementById('login-form');
+            var panelItems = document.getElementById('panel-items');
+
+            if (loginPage)
+            {
+                panelItems.style.display = "none";
                 loginPage.style.display = "block";
+                
+                loginForm.style.display = "block";
+                signupForm.style.display = "none";
+            }
+        }
+
+        function showSignupPage() {
+            var loginPage = document.getElementById('login');
+            var signupForm = document.getElementById('signup-form');
+            var loginForm = document.getElementById('login-form');
+            var panelItems = document.getElementById('panel-items');
+
+            if (loginPage)
+            {
+                panelItems.style.display = "none";
+                loginPage.style.display = "block";
+                
+                loginForm.style.display = "none";
+                signupForm.style.display = "block";
             }
         }
     </script>

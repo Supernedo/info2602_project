@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ current_movie.title }} Review</title>
+        <title>{{ current_user.display_name }}'s Watchlist</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/752212043125227571/1227669996369612830/oie_gsII4R2sd8Ea.png?ex=66293fc8&is=6616cac8&hm=9e9ff980dd2ad487353b1054d4d1295c9981be4941cb9b815241c76b05f381ac&">
         
@@ -120,7 +120,6 @@
             </div>
         </div>
     
-
         <div class="content">
             <div class="blur-containter">
                 <div class="blur-overlay"></div>
@@ -140,124 +139,104 @@
                     </button>
                 </form>
             </div>
-    
-           
-                <div id="movie-header">
-                {% if is_authenticated %}
-                    <form id="movie-form-watchlist" action="/watchlist" method="POST">
-                        <div id="add-watchlist-submit">
-                            <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                            <button class="add-watchlist" type="submit" value="Submit">
-                                <span class="add-watchlist-text">Add To Watchlist</span>
-                            </button>
-                        </div>
-                    </form>
-                {% endif %}
-
-                    <form id="movie-form-reviews" action="/{{ current_movie.href }}/reviews/all" method="GET">
-                        <div id="add-watchlist-submit">
-                            <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                            <button class="add-watchlist" type="submit" value="Submit">
-                                <span class="add-watchlist-text">View All Reviews</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-    
-            <!-- Add sorting option -->
-            <div id="firstRow">
-                <div id="review-banner">
-                    <h2 id="subTitle">{{ current_movie.title }}</h2>
-    
-                    <div id="review-movie-content">
-                        <img id="review-movie-backdrop" src="{{ current_movie.backdrop }}" alt="{{ current_movie.title }}">
-                        <div class="review-movie-overlay">
-                            <p id="review-movie-details">{{ current_movie.description }}</p>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="movies_reviews">
-                    <!-- List of movies -->
-                    <div id="moviesList_reviews">
-                        {% for movie in movies %}
-                            <div class="movieCard_reviews">
-                                <a id="movieLink" href="/{{ movie.href }}/review">
-                                    <img id="movieCardImg" src ="{{ movie.thumbnail }}">
-                                    <p id="movieDetails">{{ movie.title }}</p>
-                                    <p id="movieDetails">{{ movie.release_date }}</p>
-                                </a>
-                            </div>
-                        {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div id="reviewBox" class="box">
-                        <h2 id="subTitle">Create Review</h2>
-                        
-                            <div class="filterList">
-                                <form action="/review" method="post">
-                                    <input type="hidden" name="movie_id" value="{{ current_movie.id }}">
-
-                                    <div id="reviewItem">
-                                        <h3>{{ current_movie.title }}</h3>
-                                    </div>
-                                    <div id="reviewItem">
-                                        <h3>Genres: {{ current_movie.genres }}</h3>
-                                    </div>
-                                    <div id="reviewItem">
-                                        <h3>Release Date: {{ current_movie.release_date }}</h3>
-                                    </div>
-
-                                    {% if is_authenticated %}
-                                        {% if has_reviewed %}
-                                            <div id="review-rating">
-                                                <h3>Your rating: </h3>
-                                                <span>{{ review.rating }}</span>
-                                            </div>
-                                            <div id="review-rating-text">
-                                                <h3>Your Review:</h3>
-                                                <span>{{ review.text }}</span>
-                                            </div>
-                                            <div id="review-submit">
-                                                <a id="delete-submit" data-value="{{ review.id }}" value="Delete">
-                                                    <span class="login-button-text">Delete</span>
-                                                </a>
-                                            </div>
-                                        {% else %}
-                                            <div id="reviewItem-rating">
-                                                <h3>Add your rating: </h3>
-                                                <input class="login-input" type="number" name="rating" min="1" max="5" step="1" placeholder="Number between 1 and 5...">
-                                            </div>
-                                            <div id="reviewItem-text">
-                                                <h3>Write Your Review:</h3>
-                                                <textarea id="review-textarea" name="text" placeholder="Enter your review here..."></textarea>
-                                            </div>
-                                            <div id="reviewItem-submit">
-                                                <button class="login-submit" type="submit" value="Submit">
-                                                    <span class="login-button-text">Create</span>
-                                                </button>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div id="review-item-login">
-                                            <h2 id="subTitle">Login or Signup to create a review!</h2>
-                                        </div>
-                                    {% endif %}
-                                </form>
-                            </div>
-                    </div>
-                </div>
-                
-            </div>
 
             <!-- Second Row -->
             <video id="videoBG" autoplay loop muted>
                 <source src="https://cdn.discordapp.com/attachments/752212043125227571/1228163328782635059/Moonshower_2.mp4?ex=662b0b3b&is=6618963b&hm=4f82b9b015b4bcd9444eabef9d4db39e2fcaf7032e3306d688d883b5bd783694&"
                     type="video/mp4">
             </video>
+
+            <!-- Share Confirmation Popup -->
+            <form id="share-confirm" action="/{{ current_user.display_name }}/{{ watchlist.id }}/share">
+                <div id="confirm-container">
+                    <h2 id="confirm-text-header">Are you sure?</h2>
+                    <p id="confirm-text-general">By clicking Share, you are making your watchlist visible to every with this link.</p>
+                    <a id="confirm-text-link" href="/{{ current_user.display_name }}/{{ watchlist.id }}/share">/{{ current_user.display_name }}/{{ watchlist.id }}/share</a>
+
+                    <div id="confirm-buttons">
+                        <button id="confirm-button-accept" type="submit" value="Submit">
+                            <span class="confirm-text">Accept</span>
+                        </button>
+
+                        <button id="confirm-button-deny" onclick="showShareConfirm()">
+                            <span class="confirm-text">Deny</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Watchlist page -->
+            <div id="watchlist-header">
+                <h1 id="watchlist-title">{{ current_user.username }}'s Watchlist</h1>
+
+                {% if is_authenticated %}
+                    <form id="watchlist-share-form">
+                        <button id="watchlist-button">
+                            <span class="watchlist-subtitle">Share List</span>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <div id="watchlist-recent">
+                <div id="watchlist-recently-added">
+                    <h2 class="watchlist-subtitle">Recently Added</h2>
+                </div>
+                
+                <!-- Display most recent movies -->
+                <div id="watchlist-recent-list">
+                    {% if not recent_movies %}
+                        <div id="watchlist-recent-empty">
+                            <span class="watchlist-subtitle">No Recent Movies Found.</span>
+                            <span class="watchlist-subtitle">Let's go add some to your watch list!</span>
+                        </div>
+                    {% else %}
+                        {% for recent_movie in recent_movies %}
+                            <a id="movieLink" href="/{{ recent_movie.href }}/review">
+                                <div class="watchlist-recent-movie-card">
+                                    <img class="watchlist-recent-movie-image" src="{{ recent_movie.thumbnail }}" alt="Watchlist_Recent_Movie_Image">
+                                    <span class="watchlist-subtitle">{{ recent_movie.title }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Display all movies from first to last -->
+            <div id="watchlist-all-list">
+                {% for movie in movies %}
+                    <div class="watchlist-movie-item">
+                        <!-- Movie Number -->
+                        <div class="watchlist-movie-number">
+                            <p class="watchlist-movie-text-iterate">#{{ loop.index }}</p>
+                        </div>
+                        
+                        <!-- Movie List Card -->
+                        <div class="watchlist-movie-list-card">
+                            <div class="watchlist-movie-list-details">
+                                <p class="watchlist-title">{{ movie.title }}</p>
+                                <p class="watchlist-movie-text">{{ current_user.display_name }}'s Rating: N/A</p>
+
+                                {% if is_authenticated %}
+                                    <form class="watchlist-delete-form" data-movie-id="{{ movie.id }}">
+                                        <button class="delete-movie-button" type="submit" data-value="{{ movie.id }}">
+                                            <img class="watchlist-bin-img" src="https://cdn.discordapp.com/attachments/752212043125227571/1231552274866634883/pngwing.com_4.png?ex=66375f6f&is=6624ea6f&hm=c78cc716465acb51af93d3145d2b07840fe5598892de1ed29694b4b5a8701c93&" alt="movie_bin">
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                
+                            </div>
+
+                            <form class="watchlist-view-movie-form" action="/{{ movie.href }}/review">
+                                <button id="watchlist-button">
+                                    <span class="watchlist-subtitle">View Movie</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </body>
 
@@ -345,29 +324,52 @@
             }
         }
 
-        document.getElementById('delete-submit').addEventListener('click', function(event) {
-        event.preventDefault();
+        document.getElementById('watchlist-share-form').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        const review = document.getElementById('delete-submit');
+            showShareConfirm();
+        });
 
-        if (review) {
-            var reviewId = review.getAttribute('data-value');
+        function showShareConfirm() {
+            var share = document.getElementById('share-confirm')
 
-            fetch('/reviews/' + reviewId, {
-                method: 'DELETE',
-                body: JSON.stringify({ /* Request body */ }),
-                headers: {
-                    'Content-Type': 'application/json'
+            if (share)
+            {
+                if (share.style.display == "block")
+                {
+                    share.style.display = "none";
                 }
-            }).then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
+                else
+                {
+                    share.style.display = "block";
                 }
-            }).catch(error => {
-                console.error('Error:', error);
-            });
+            }
         }
-    });
+
+        document.querySelectorAll('.delete-movie-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const movieId = this.closest('.watchlist-delete-form').getAttribute('data-movie-id');
+
+                fetch('/watchlist/' + movieId, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ /* Request body */ }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+
+        document.getElementById('confirm-button-deny').addEventListener('click', function(event) {
+            event.preventDefault(); 
+        });
     </script>
 </html>

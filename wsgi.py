@@ -33,9 +33,18 @@ migrate = get_migrate(app)
 def initialize():
     db.drop_all()
     db.create_all()
-    create_user('bob', 'bobpass')
+    create_user('BobTheBuilder', 'bob', 'bobpass')
 
     # Import movie files from API
+
+    genre_url = "https://api.themoviedb.org/3/genre/movie/list"
+    genre_headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ZDcyMThmOTE2Yzk2MWEyNjc3ZmI1ZTdjMjFmZmNjNyIsInN1YiI6IjY2MThkM2VlMGYwZGE1MDE3Y2RmNWI3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.MhyHjQ2gXlSLm0zjI5dEwX7nwQQ58hzd25wnCKC3fjo"
+        }
+
+    genre_response = requests.get(genre_url, headers=genre_headers)
+    movie_genres = genre_response.json().get("genres", [])
 
     for page in range(1,501):
         url = "https://api.themoviedb.org/3/discover/movie"
@@ -61,14 +70,17 @@ def initialize():
                 # If a movie with the same ID already exists, skip adding it
                 continue
 
+            # Get genre names corresponding to the genre IDs
+            genre_names = [genre['name'] for genre in movie_genres if genre['id'] in movie.get('genre_ids', [])]
+            formatted_genre_names = ", ".join(genre_names)
+
             new_movie = Movie(
                 # Set generic values if unable to attain a value
                 id=movie.get('id', 0),
                 title=movie.get('title', 'Movie_Title'), 
-                release_date=movie.get('release_date', 'Movie_Date'), 
-                #cast_arr=movie.get('cast', []),
+                release_date=movie.get('release_date', 'Movie_Date'),
                 language=movie.get('original_language', 'Movie_Language'),
-                #genres_arr=movie.get('genre_ids', []), 
+                genres=formatted_genre_names,
                 description=movie.get('overview', 'Movie_Description'), 
                 thumbnail=movie.get('poster_path', 'Movie_Thumbnail_Link'), 
                 backdrop=movie.get('backdrop_path', 'Movie_Backdrop_Link'),
@@ -125,8 +137,8 @@ user_cli = AppGroup('user', help='User object commands')
 @user_cli.command("create", help="Creates a user")
 @click.argument("username", default="rob")
 @click.argument("password", default="robpass")
-def create_user_command(username, password):
-    create_user(username, password)
+def create_user_command(display_name, username, password):
+    create_user(display_name, username, password)
     print(f'{username} created!')
 
 # this command will be : flask user create bob bobpass
